@@ -202,20 +202,24 @@
                     chat: 'Connection to Server Opened'
                 }
             });
-            $.cometd.batch(function()
-            {
-                _unsubscribe();
-                _subscribe();
-                $.cometd.publish('/service/members', {
-                    user: _username,
-                    room: '/chat/demo'
-                });
-                $.cometd.publish('/chat/demo', {
-                    user: _username,
-                    membership: 'join',
-                    chat: _username + ' has joined'
-                });
-            });
+			setTimeout( function()
+			{
+				$.cometd.batch(function()
+				{
+					_unsubscribe();
+					_subscribe();
+					$.cometd.publish('/service/members', {
+						userId: $.cometd.getClientId(),
+						user: _username,
+						room: '/chat/demo'
+					});
+					$.cometd.publish('/chat/demo', {
+						user: _username,
+						membership: 'join',
+						chat: _username + ' has joined'
+					});
+				});
+			}, 500 );
         }
 
         function _connectionBroken()
@@ -279,7 +283,7 @@
 
         $(window).unload(function()
         {
-            $.cometd.reload();
+            $.cometd.disconnect();
             // Save the application state only if the user was chatting
             if (_wasConnected && _username)
             {

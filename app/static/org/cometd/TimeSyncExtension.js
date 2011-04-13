@@ -1,6 +1,6 @@
 /**
  * Dual licensed under the Apache License 2.0 and the MIT license.
- * $Revision: 757 $ $Date: 2009-09-30 16:14:51 +0200 (Wed, 30 Sep 2009) $
+ * $Revision: 1586 $ $Date: 2010-12-22 15:36:07 +0100 (Wed, 22 Dec 2010) $
  */
 
 if (typeof dojo != "undefined")
@@ -192,6 +192,6 @@ org.cometd.TimeSyncExtension = function(configuration)
         {
             interval = 1;
         }
-        return setTimeout(callback, interval);
+        return org.cometd.Utils.setTimeout(_cometd, callback, interval);
     };
 };

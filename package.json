@@ -1,11 +1,12 @@
 {
     "name": "ringo-cometd",
-    "version": "0.1.0",
+    "version": "0.2",
     "description": "A cometd plugin for ringo/webapp",
     "keywords": ["cometd", "ringo"],
-    "author": "Hannes Wallnöfer (http://henso.com/) <hannes@helma.at>",
+    "author": ["Hannes Wallnöfer (http://henso.com/) <hannes@helma.at>", "Garry Yao <yaojun85@gmail.com>"],
     "jars": [
-        "jars/cometd-java-server-1.1.1.jar",
-        "jars/cometd-api-1.1.1.jar"
+		"jars/bayeux-api-2.1.1.jar",
+		"jars/cometd-java-common-2.1.1.jar",
+        "jars/cometd-java-server-2.1.1.jar"
     ]
 }

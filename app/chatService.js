@@ -1,53 +1,57 @@
 var {addListener, publish, send, BayeuxService} = require("ringo/cometd");
-
+var _ = require("underscore");
 export("serverStarted");
-
 module.shared = true;
 
 var service;
-var rooms = {};
+var rooms = {}, users = {};
 
-function handleMembership(clientId, data) {
-    var members = rooms[data.room];
-    if (!members) {
-        members = rooms[data.room] = {};
-    }
-    members[data.user] = clientId;
-    function broadcastMembers() {
-        publish("/chat/members", service.getId(), Object.keys(members));
-    }
-    addListener("removed", function(id) {
-        for (var i in members) {
-            if (members[i] == id) delete members[i];
-        }
-        broadcastMembers();
-    }, clientId);
-    broadcastMembers();
+function onUserDisconnect( id )
+{
+	if ( id in users )
+	{
+		for ( var i in rooms )
+		{
+			var room = rooms[ i ];
+			var index = room.indexOf(id);
+			if ( index != -1 )
+			{
+				print( 'user leave:', users[ id ] );
+				delete users[ id ];
+				room.splice( index, 1 );
+				showRoomUsers(room);
+			}
+		}
+	}
 }
 
-function privateChat(clientId, data) {
-    var members = rooms[data.room];
-    var peers = data.peer.split(",").map(function(name) {
-        return members[name];
-    });
-    var message = {
-        chat: data.chat,
-        user: data.user,
-        scope: "private"
-    };
-    peers.forEach(function(peer) {
-        if (peer) {
-            send(clientId, peer, data.room, message)
-        }
-    });
-    send(clientId, clientId, data.room, message);
+function onUserConnect(id) {
+	users[ id ] = 1;
+}
+
+function onJoinRoom(channel, evt)
+{
+	var data =evt.data;
+	if ( (data.userId in users) )
+	{
+		users[ data.userId ] = data.user;
+		var room = rooms[data.room];
+		if ( !room)
+			room = rooms[data.room] = [];
+		room.push(data.userId);
+		print( 'user joined:', users[ data.userId ] );
+	}
+	showRoomUsers(rooms[data.room]);
+}
+
+function showRoomUsers( room )
+{
+	service.publish("/chat/members",  _( room).map( function( userId ) { return users[ userId ]; }));
 }
 
 function serverStarted(server) {
     service = new BayeuxService("chat");
-    service.subscribe("/service/members", handleMembership);
-    service.subscribe("/service/privatechat", privateChat);
-    /* addListener("channelAdded", function(c) {
-        print(" *********** CHANNEL ADDED: " + c);
-    }); */
+    service.subscribe("/service/members", onJoinRoom);
+	service.clientRemoved(onUserDisconnect)
+	service.clientAdded(onUserConnect)
 }
