@@ -1,7 +1,7 @@
 {
-    "name": "ringo-cometd",
-    "version": "0.2",
-    "description": "A cometd plugin for ringo/webapp",
+    "name": "ringo-cometd-chat",
+    "version": "0.1",
+    "description": "A cometd-based chat application for ringojs",
     "keywords": ["cometd", "ringo"],
     "author": ["Hannes Wallnöfer (http://henso.com/) <hannes@helma.at>", "Garry Yao <yaojun85@gmail.com>"],
     "jars": [
